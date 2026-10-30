@@ -1,0 +1,9 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+/* Remove the Fork me on GitHub ribbon */
+#forkme_banner {
+  display: none !important;
+}
