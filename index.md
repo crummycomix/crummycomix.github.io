@@ -1,4 +1,3 @@
-
 {% for post in paginator.posts %}
   <article class="comic">
     <h2>
