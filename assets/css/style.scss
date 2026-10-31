@@ -8,6 +8,11 @@
   display: none !important;
 }
 
-#footer_wrap .inner p {
+/* Hide Merlot's default footer content */
+#footer_wrap {
+  display: none !important;
+}
+
+footer {
   display: none !important;
 }
