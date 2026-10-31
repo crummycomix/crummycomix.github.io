@@ -8,6 +8,11 @@
   display: none !important;
 }
 
+/* Keep the footer banner but hide its text and links */
+#footer_wrap .inner {
+  display: none !important;
+}
+
 /* Hide Merlot's default footer content
 #footer_wrap {
   display: none !important;
