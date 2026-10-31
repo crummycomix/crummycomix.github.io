@@ -1,25 +1,53 @@
+
 ---
 layout: default
 ---
 
 {{ content }}
 
-{% if page.previous or page.next %}
 <nav class="comic-pagination">
 
-  {% if page.next %}
-    <a class="comic-previous"
-       href="{{ page.next.url | relative_url }}">
-      ← Previous comic
-    </a>
-  {% endif %}
+  <div class="comic-nav-left">
+    {% if page.next %}
+      <a href="{{ page.next.url | relative_url }}">
+        ← Previous
+      </a>
+    {% endif %}
+  </div>
 
-  {% if page.previous %}
-    <a class="comic-next"
-       href="{{ page.previous.url | relative_url }}">
-      Next comic →
+  <div class="comic-nav-centre">
+    <a id="random-comic" href="#">
+      Random
     </a>
-  {% endif %}
+  </div>
+
+  <div class="comic-nav-right">
+    {% if page.previous %}
+      <a href="{{ page.previous.url | relative_url }}">
+        Next →
+      </a>
+    {% endif %}
+  </div>
 
 </nav>
-{% endif %}
+
+<script>
+(function() {
+  const comics = [
+    {% for post in site.posts %}
+      {{ post.url | relative_url | jsonify }}{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ];
+
+  const currentComic = {{ page.url | relative_url | jsonify }};
+  const alternatives = comics.filter(url => url !== currentComic);
+  const randomLink = document.getElementById('random-comic');
+
+  if (alternatives.length > 0) {
+    const randomIndex = Math.floor(Math.random() * alternatives.length);
+    randomLink.href = alternatives[randomIndex];
+  } else {
+    randomLink.style.display = 'none';
+  }
+})();
+</script>
