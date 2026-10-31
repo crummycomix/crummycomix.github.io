@@ -1,0 +1,13 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const title = document.querySelector('.ribbon-inner h1');
+
+  if (title && !title.querySelector('a')) {
+    const link = document.createElement('a');
+    link.href = '{{ "/" | relative_url }}';
+    link.textContent = title.textContent;
+    title.textContent = '';
+    title.appendChild(link);
+  }
+});
+</script>
