@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   process-and-publish:
-    runs-on: ubuntu-latest
+    runs-on: github-pages
 
     steps:
       - name: Check out repository
@@ -161,4 +161,5 @@ jobs:
         uses: actions/upload-pages-artifact@v3
 
       - name: Deploy website
+        id: deployment
         uses: actions/deploy-pages@v4
