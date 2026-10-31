@@ -1,4 +1,5 @@
-{% for post in site.posts %}
+
+{% for post in paginator.posts %}
   <article class="comic">
     <h2>
       <a href="{{ post.url | relative_url }}">
@@ -9,3 +10,19 @@
     {{ post.content }}
   </article>
 {% endfor %}
+
+<nav class="pagination">
+  {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path | relative_url }}">
+      &larr; Newer comics
+    </a>
+  {% endif %}
+
+  <span>Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+
+  {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | relative_url }}">
+      Older comics &rarr;
+    </a>
+  {% endif %}
+</nav>
