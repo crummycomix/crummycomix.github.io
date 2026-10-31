@@ -63,6 +63,12 @@ jobs:
               else datetime.now(timezone.utc).date()
           )
 
+          commit_message = event.get("head_commit", {}).get("message", "")
+          title = commit_message.splitlines()[0].strip() if commit_message else ""
+
+          if title.lower() in ("add files via upload", "upload files"):
+            title = ""
+
           supported = {".heic", ".heif", ".jpg", ".jpeg"}
 
           def unique_path(path):
@@ -97,12 +103,7 @@ jobs:
                       except ValueError:
                           print("Could not read EXIF date; using upload date")
 
-                  title = re.sub(r"[_-]+", " ", source.stem).strip()
-                  title = title or "Untitled comic"
-
-                  slug = re.sub(
-                      r"[^a-z0-9]+", "-", title.lower()
-                  ).strip("-") or "comic"
+                  slug = re.sub(r"[^a-z0-9]+", "-", source.stem.lower()).strip("-") or "comic"
 
                   date_text = capture_date.strftime("%Y-%m-%d")
 
@@ -125,7 +126,7 @@ jobs:
 
               post_content = f"""---
           layout: post
-          title: "{title.replace(chr(34), chr(39))}"
+          title: {json.dumps(title)}
           date: {date_text}
           image: {relative_image}
           ---
