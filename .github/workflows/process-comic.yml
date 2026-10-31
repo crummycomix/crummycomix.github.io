@@ -16,7 +16,9 @@ concurrency:
 
 jobs:
   process-and-publish:
-    runs-on: github-pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
 
     steps:
       - name: Check out repository
