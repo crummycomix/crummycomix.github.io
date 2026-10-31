@@ -8,8 +8,13 @@
   display: none !important;
 }
 
-/* Keep the footer banner but hide its text and links */
-#footer_wrap .inner {
+/* Hide text inside the footer ribbon */
+footer .ribbon-inner p {
+  display: none !important;
+}
+
+/* Hide the generated-by text below the ribbon */
+footer > p {
   display: none !important;
 }
 
