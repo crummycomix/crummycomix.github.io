@@ -1,3 +1,4 @@
+
 name: Process Comic Upload
 
 on:
@@ -60,6 +61,7 @@ jobs:
               event = json.load(f)
 
           timestamp = event.get("head_commit", {}).get("timestamp")
+
           fallback_date = (
               datetime.fromisoformat(timestamp.replace("Z", "+00:00")).date()
               if timestamp
@@ -67,81 +69,214 @@ jobs:
           )
 
           commit_message = event.get("head_commit", {}).get("message", "")
-          title = commit_message.splitlines()[0].strip() if commit_message else ""
+          commit_title = (
+              commit_message.splitlines()[0].strip()
+              if commit_message else ""
+          )
 
-          if title.lower() in ("add files via upload", "upload files"):
-            title = ""
+          generic_titles = {
+              "add files via upload",
+              "upload files",
+              "add files",
+              "update files"
+          }
+
+          if commit_title.lower() in generic_titles:
+              commit_title = ""
 
           supported = {".heic", ".heif", ".jpg", ".jpeg"}
+
+          def slugify(value):
+              return (
+                  re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+                  or "comic"
+              )
 
           def unique_path(path):
               if not path.exists():
                   return path
+
               number = 2
+
               while True:
                   candidate = path.with_name(
                       f"{path.stem}-{number}{path.suffix}"
                   )
+
                   if not candidate.exists():
                       return candidate
+
                   number += 1
 
+          def get_capture_date(source):
+              try:
+                  with Image.open(source) as photo:
+                      exif = photo.getexif()
+
+                      date_value = (
+                          exif.get(36867)
+                          or exif.get(36868)
+                          or exif.get(306)
+                      )
+
+                      if date_value:
+                          try:
+                              return datetime.strptime(
+                                  str(date_value),
+                                  "%Y:%m:%d %H:%M:%S"
+                              ).date()
+                          except ValueError:
+                              pass
+
+              except Exception as error:
+                  print(f"Could not read EXIF date: {error}")
+
+              return fallback_date
+
+          # Collect and group uploaded images.
+
+          groups = {}
+
           for source in sorted(incoming.iterdir()):
-              if not source.is_file() or source.suffix.lower() not in supported:
+              if (
+                  not source.is_file()
+                  or source.suffix.lower() not in supported
+              ):
                   continue
 
-              print(f"Processing {source.name}")
+              match = re.match(
+                  r"^(?P<base>.+)-(?P<number>\d+)$",
+                  source.stem
+              )
 
-              capture_date = fallback_date
+              if match:
+                  base_name = match.group("base")
+                  panel_number = int(match.group("number"))
+                  group_key = ("numbered", base_name.casefold())
+              else:
+                  base_name = source.stem
+                  panel_number = None
+                  group_key = ("single", source.name.casefold())
 
-              with Image.open(source) as photo:
-                  exif = photo.getexif()
-                  date_value = exif.get(36867) or exif.get(36868) or exif.get(306)
+              groups.setdefault(group_key, []).append({
+                  "source": source,
+                  "base": base_name,
+                  "panel": panel_number
+              })
 
-                  if date_value:
-                      try:
-                          capture_date = datetime.strptime(
-                              str(date_value), "%Y:%m:%d %H:%M:%S"
-                          ).date()
-                      except ValueError:
-                          print("Could not read EXIF date; using upload date")
+          print(f"Found {len(groups)} comic(s) to process")
 
-                  slug = re.sub(r"[^a-z0-9]+", "-", source.stem.lower()).strip("-") or "comic"
+          # Process each comic group.
 
-                  date_text = capture_date.strftime("%Y-%m-%d")
+          for group in groups.values():
 
-                  image_path = unique_path(
-                      images / f"{date_text}-{slug}.jpg"
+              group.sort(
+                  key=lambda item: (
+                      item["panel"] if item["panel"] is not None else 0,
+                      item["source"].name.lower()
                   )
+              )
 
-                  if source.suffix.lower() in {".heic", ".heif"}:
-                      photo.convert("RGB").save(
-                          image_path, "JPEG", quality=95
-                      )
-                  else:
-                      shutil.copy2(source, image_path)
+              base_name = group[0]["base"]
+              is_multi = len(group) > 1
+
+              capture_date = get_capture_date(
+                  group[0]["source"]
+              )
+
+              date_text = capture_date.strftime("%Y-%m-%d")
+              slug = slugify(base_name)
+
+              # Use commit message as title for a single comic.
+              # Otherwise derive the title from the filename.
+
+              if len(groups) == 1 and commit_title:
+                  title = commit_title
+              else:
+                  title = re.sub(
+                      r"[-_]+", " ", base_name
+                  ).strip().title()
 
               post_path = unique_path(
                   posts / f"{date_text}-{slug}.md"
               )
 
-              relative_image = "/" + image_path.as_posix()
+              # Use the final post filename as the image identifier.
 
-              post_content = f"""---
+              post_slug = post_path.stem
+              published_images = []
+
+              for index, item in enumerate(group, start=1):
+
+                  source = item["source"]
+
+                  if is_multi:
+                      panel_number = item["panel"]
+                      image_name = (
+                          f"{post_slug}-{panel_number:02d}.jpg"
+                      )
+                  else:
+                      image_name = f"{post_slug}.jpg"
+
+                  image_path = unique_path(images / image_name)
+
+                  print(f"Processing {source.name}")
+
+                  with Image.open(source) as photo:
+
+                      if source.suffix.lower() in {".heic", ".heif"}:
+                          photo.convert("RGB").save(
+                              image_path,
+                              "JPEG",
+                              quality=95
+                          )
+                      else:
+                          shutil.copy2(source, image_path)
+
+                  relative_image = "/" + image_path.as_posix()
+
+                  published_images.append(relative_image)
+
+                  source.unlink()
+
+                  print(f"Saved {image_path}")
+
+              # Generate one post containing all panels.
+
+              first_image = published_images[0]
+
+              front_matter = f"""---
           layout: post
           title: {json.dumps(title)}
           date: {date_text}
-          image: {relative_image}
-          ---
-
-          ![{title}]({relative_image})
+          image: {first_image}
+          images:
           """
 
-              post_path.write_text(post_content, encoding="utf-8")
-              source.unlink()
+              for image in published_images:
+                  front_matter += f"  - {json.dumps(image)}\n"
+
+              body = ""
+
+              for index, image in enumerate(
+                  published_images, start=1
+              ):
+                  if is_multi:
+                      alt_text = f"{title} - panel {index}"
+                  else:
+                      alt_text = title
+
+                  body += f"![{alt_text}]({image})\n\n"
+
+              post_content = front_matter + "---\n\n" + body
+
+              post_path.write_text(
+                  post_content,
+                  encoding="utf-8"
+              )
 
               print(f"Created {post_path}")
-              print(f"Saved {image_path}")
+              print(f"Published {len(published_images)} panel(s)")
 
           PY
 
