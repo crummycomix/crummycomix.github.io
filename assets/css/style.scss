@@ -16,3 +16,21 @@
 footer {
   display: none !important;
 }
+
+.comic-pagination {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 35px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+  font-weight: bold;
+}
+
+.comic-pagination a {
+  color: #8b2635;
+  text-decoration: none;
+}
+
+.comic-pagination a:hover {
+  text-decoration: underline;
+}
