@@ -17,11 +17,13 @@ footer {
   display: none !important;
 }
 
+
 .comic-pagination {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 35px;
-  padding-top: 20px;
+  padding: 20px 0;
   border-top: 1px solid #ddd;
   font-weight: bold;
 }
@@ -33,4 +35,22 @@ footer {
 
 .comic-pagination a:hover {
   text-decoration: underline;
+}
+
+.comic-nav-left,
+.comic-nav-centre,
+.comic-nav-right {
+  flex: 1;
+}
+
+.comic-nav-left {
+  text-align: left;
+}
+
+.comic-nav-centre {
+  text-align: center;
+}
+
+.comic-nav-right {
+  text-align: right;
 }
