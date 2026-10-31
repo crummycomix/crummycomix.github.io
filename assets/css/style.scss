@@ -13,8 +13,22 @@ footer .ribbon-inner p {
   display: none !important;
 }
 
+/* Hide footer ribbon text but retain its height */
+footer .ribbon-inner p {
+  display: none !important;
+}
+
+footer .ribbon-inner {
+  min-height: 18px;
+}
+
 /* Hide the generated-by text below the ribbon */
 footer > p {
+  display: none !important;
+}
+
+/* Hide the Octocat logo */
+footer span.octocat {
   display: none !important;
 }
 
