@@ -1,0 +1,164 @@
+name: Process Comic Upload
+
+on:
+  push:
+    paths:
+      - 'incoming/**'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: comic-publishing
+  cancel-in-progress: false
+
+jobs:
+  process-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install image libraries
+        run: |
+          pip install pillow pillow-heif
+
+      - name: Process uploaded comics
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import json
+          import shutil
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          from PIL import Image
+          from pillow_heif import register_heif_opener
+
+          register_heif_opener()
+
+          incoming = Path("incoming")
+          images = Path("images")
+          posts = Path("_posts")
+
+          images.mkdir(exist_ok=True)
+          posts.mkdir(exist_ok=True)
+
+          with open(os.environ["GITHUB_EVENT_PATH"]) as f:
+              event = json.load(f)
+
+          timestamp = event.get("head_commit", {}).get("timestamp")
+          fallback_date = (
+              datetime.fromisoformat(timestamp.replace("Z", "+00:00")).date()
+              if timestamp
+              else datetime.now(timezone.utc).date()
+          )
+
+          supported = {".heic", ".heif", ".jpg", ".jpeg"}
+
+          def unique_path(path):
+              if not path.exists():
+                  return path
+              number = 2
+              while True:
+                  candidate = path.with_name(
+                      f"{path.stem}-{number}{path.suffix}"
+                  )
+                  if not candidate.exists():
+                      return candidate
+                  number += 1
+
+          for source in sorted(incoming.iterdir()):
+              if not source.is_file() or source.suffix.lower() not in supported:
+                  continue
+
+              print(f"Processing {source.name}")
+
+              capture_date = fallback_date
+
+              with Image.open(source) as photo:
+                  exif = photo.getexif()
+                  date_value = exif.get(36867) or exif.get(36868) or exif.get(306)
+
+                  if date_value:
+                      try:
+                          capture_date = datetime.strptime(
+                              str(date_value), "%Y:%m:%d %H:%M:%S"
+                          ).date()
+                      except ValueError:
+                          print("Could not read EXIF date; using upload date")
+
+                  title = re.sub(r"[_-]+", " ", source.stem).strip()
+                  title = title or "Untitled comic"
+
+                  slug = re.sub(
+                      r"[^a-z0-9]+", "-", title.lower()
+                  ).strip("-") or "comic"
+
+                  date_text = capture_date.strftime("%Y-%m-%d")
+
+                  image_path = unique_path(
+                      images / f"{date_text}-{slug}.jpg"
+                  )
+
+                  if source.suffix.lower() in {".heic", ".heif"}:
+                      photo.convert("RGB").save(
+                          image_path, "JPEG", quality=95
+                      )
+                  else:
+                      shutil.copy2(source, image_path)
+
+              post_path = unique_path(
+                  posts / f"{date_text}-{slug}.md"
+              )
+
+              relative_image = "/" + image_path.as_posix()
+
+              post_content = f"""---
+          layout: post
+          title: "{title.replace(chr(34), chr(39))}"
+          date: {date_text}
+          image: {relative_image}
+          ---
+
+          ![{title}]({relative_image})
+          """
+
+              post_path.write_text(post_content, encoding="utf-8")
+              source.unlink()
+
+              print(f"Created {post_path}")
+              print(f"Saved {image_path}")
+
+          PY
+
+      - name: Save generated comics to repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add incoming images _posts
+          if ! git diff --cached --quiet; then
+            git commit -m "Automatically publish uploaded comics"
+            git push
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build Jekyll website
+        uses: actions/jekyll-build-pages@v1
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v3
+
+      - name: Deploy website
+        uses: actions/deploy-pages@v4
