@@ -1,0 +1,25 @@
+---
+layout: default
+---
+
+{{ content }}
+
+{% if page.previous or page.next %}
+<nav class="comic-pagination">
+
+  {% if page.next %}
+    <a class="comic-previous"
+       href="{{ page.next.url | relative_url }}">
+      ← Previous comic
+    </a>
+  {% endif %}
+
+  {% if page.previous %}
+    <a class="comic-next"
+       href="{{ page.previous.url | relative_url }}">
+      Next comic →
+    </a>
+  {% endif %}
+
+</nav>
+{% endif %}
