@@ -224,14 +224,43 @@ jobs:
 
                   with Image.open(source) as photo:
 
-                      if source.suffix.lower() in {".heic", ".heif"}:
-                          photo.convert("RGB").save(
-                              image_path,
-                              "JPEG",
-                              quality=95
+                      # Correct image orientation
+                      from PIL import ImageOps
+
+                      photo = ImageOps.exif_transpose(photo)
+
+                      # Resize images wider than 1000px
+                      if photo.width > 1000:
+                          new_height = round(
+                              photo.height * 1000 / photo.width
                           )
+
+                          photo = photo.resize(
+                              (1000, new_height),
+                              Image.Resampling.LANCZOS
+                          )
+
+                      # Convert to RGB (JPEG doesn't support transparency)
+                      if photo.mode in ("RGBA", "LA"):
+                          background = Image.new(
+                              "RGB", photo.size, "white"
+                          )
+                          background.paste(
+                              photo,
+                              mask=photo.getchannel("A")
+                          )
+                          photo = background
                       else:
-                          shutil.copy2(source, image_path)
+                          photo = photo.convert("RGB")
+
+                      # Save optimised JPEG
+                      photo.save(
+                          image_path,
+                          "JPEG",
+                          quality=85,
+                          optimize=True,
+                          progressive=True
+                      )
 
                   relative_image = "/" + image_path.as_posix()
 
