@@ -174,18 +174,21 @@ div#no-downloads span.inner {
 
 /* Remove Merlot's blue shield and fallback artwork */
 
+/* Hide blue artwork but preserve Merlot's layout spacing */
+
 #downloads,
 #no-downloads {
-  display: none !important;
+  background: none !important;
+  background-image: none !important;
 }
 
-#downloads *,
-#no-downloads * {
+#downloads .inner,
+#no-downloads .inner {
+  background: none !important;
   background-image: none !important;
 }
 
 span.banner-fix {
-  display: none !important;
   background: none !important;
   background-image: none !important;
 }
