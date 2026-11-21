@@ -171,3 +171,23 @@ div#no-downloads {
 div#no-downloads span.inner {
   background: none !important;
 }
+
+/* Remove Merlot's blue shield and fallback artwork */
+
+#downloads,
+#no-downloads {
+  background: none !important;
+  background-image: none !important;
+  visibility: hidden !important;
+}
+
+#downloads *,
+#no-downloads * {
+  background-image: none !important;
+}
+
+span.banner-fix {
+  display: none !important;
+  background: none !important;
+  background-image: none !important;
+}
