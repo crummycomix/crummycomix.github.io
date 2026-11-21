@@ -1,115 +1,47 @@
-
 ---
 ---
 
 @import "{{ site.theme }}";
 
-/* =================================
-   Forest & Parchment colour scheme
-   ================================= */
-
-/* Page background and main text */
-body {
-  background-color: #E9E1CE;
-  color: #292929;
-}
-
-/* Main header banner */
-header {
-  background: transparent !important;
-}
-
-header .ribbon-inner {
-  background: #526B57 !important;
-  background-image: none !important;
-  border-color: #526B57 !important;
-}
-
-header h1,
-header h2 {
-  background: #526B57 !important;
-  color: #E9E1CE !important;
-}
-
-header .left-tail,
-header .right-tail {
-  background: #526B57 !important;
-  background-image: none !important;
-}
-
-/* Hide blue shield artwork without collapsing layout */
-#downloads,
-#no-downloads,
-#downloads .inner,
-#no-downloads .inner {
-  background: none !important;
-  background-image: none !important;
-}
-
-span.banner-fix {
-  background: none !important;
-  background-image: none !important;
-}
-
-/* Links */
-a {
-  color: #526B57;
-}
-
-a:hover {
-  color: #263D32;
-}
-
-/* =================================
-   Footer
-   ================================= */
-
-footer .ribbon-outer,
-footer .ribbon-inner,
-footer .left-tail,
-footer .right-tail {
-  background: #526B57 !important;
-  background-image: none !important;
-  border-color: #526B57 !important;
-}
-
-footer .ribbon-outer::before,
-footer .ribbon-outer::after,
-footer .ribbon-inner::before,
-footer .ribbon-inner::after,
-footer .left-tail::before,
-footer .left-tail::after,
-footer .right-tail::before,
-footer .right-tail::after {
-  background: #526B57 !important;
-  background-image: none !important;
-  border-color: #526B57 !important;
-}
-
-/* Hide unwanted footer elements */
+/* Remove the Fork me on GitHub ribbon */
 #forkme_banner {
   display: none !important;
 }
 
+/* Hide text inside the footer ribbon */
+footer .ribbon-inner p {
+  display: none !important;
+}
+
+/* Hide footer ribbon text but retain its height */
 footer .ribbon-inner p {
   display: none !important;
 }
 
 footer .ribbon-inner {
   min-height: 18px;
+  background: #6d2028 !important;
 }
 
+/* Hide the generated-by text below the ribbon */
 footer > p {
   display: none !important;
 }
 
+/* Hide the Octocat logo */
 footer span.octocat {
   display: none !important;
 }
 
-/* =================================
-   Comic navigation
-   ================================= */
+/* Hide Merlot's default footer content
+#footer_wrap {
+  display: none !important;
+}
+
+footer {
+  display: none !important;
+}
+*/
 
 .comic-pagination {
   display: flex;
@@ -117,17 +49,16 @@ footer span.octocat {
   align-items: center;
   margin-top: 35px;
   padding: 20px 0;
-  border-top: 1px solid #B7A98A;
+  border-top: 1px solid #ddd;
   font-weight: bold;
 }
 
 .comic-pagination a {
-  color: #526B57;
+  color: #8b2635;
   text-decoration: none;
 }
 
 .comic-pagination a:hover {
-  color: #263D32;
   text-decoration: underline;
 }
 
@@ -149,10 +80,7 @@ footer span.octocat {
   text-align: right;
 }
 
-/* =================================
-   Comic images
-   ================================= */
-
+/* Centre comic images */
 .comic img,
 .comic-content img {
   display: block;
@@ -160,7 +88,6 @@ footer span.octocat {
   margin-right: auto;
 }
 
-/* Header title link */
 .ribbon-inner h1 a {
   color: inherit;
   text-decoration: none;
