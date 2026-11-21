@@ -176,9 +176,7 @@ div#no-downloads span.inner {
 
 #downloads,
 #no-downloads {
-  background: none !important;
-  background-image: none !important;
-  visibility: hidden !important;
+  display: none !important;
 }
 
 #downloads *,
