@@ -139,22 +139,35 @@ footer {
   text-decoration: none;
 }
 
+/* Forest & Parchment - Merlot header */
 
-/* Forest & Parchment - Merlot banner overrides */
-
-header .ribbon-inner {
-  background: #263D32 !important;
-  background-image: linear-gradient(#263D32, #263D32) !important;
+header {
+  background: transparent !important;
 }
 
-header .ribbon-outer .left-tail,
-header .ribbon-outer .right-tail {
+header span.ribbon-inner {
   background: #263D32 !important;
   background-image: none !important;
+  border-color: #263D32 !important;
 }
 
-header .ribbon-inner h1,
-header .ribbon-inner h2 {
+header h1,
+header h2 {
+  background: #263D32 !important;
   color: #E9E1CE !important;
 }
 
+header span.left-tail,
+header span.right-tail {
+  background: none !important;
+}
+
+/* Remove Merlot's blue shield artwork */
+section#downloads,
+div#no-downloads {
+  background: none !important;
+}
+
+div#no-downloads span.inner {
+  background: none !important;
+}
