@@ -3,6 +3,48 @@
 
 @import "{{ site.theme }}";
 
+
+/* Forest & Parchment colour scheme */
+
+/* Page background and main text */
+body {
+  background-color: #E9E1CE;
+  color: #292929;
+}
+
+/* Main banner */
+header .ribbon-inner {
+  background-color: #263D32;
+}
+
+/* Footer ribbon */
+footer .ribbon-inner {
+  background: #263D32 !important;
+}
+
+/* Links */
+a {
+  color: #526B57;
+}
+
+a:hover {
+  color: #263D32;
+}
+
+/* Comic navigation */
+.comic-pagination {
+  border-top-color: #B7A98A;
+}
+
+.comic-pagination a {
+  color: #526B57;
+}
+
+.comic-pagination a:hover {
+  color: #263D32;
+}
+
+
 /* Remove the Fork me on GitHub ribbon */
 #forkme_banner {
   display: none !important;
@@ -20,7 +62,7 @@ footer .ribbon-inner p {
 
 footer .ribbon-inner {
   min-height: 18px;
-  background: #6d2028 !important;
+  background: #263D32 !important;
 }
 
 /* Hide the generated-by text below the ribbon */
@@ -54,7 +96,7 @@ footer {
 }
 
 .comic-pagination a {
-  color: #8b2635;
+  color: #526B57;
   text-decoration: none;
 }
 
