@@ -216,3 +216,19 @@ footer .right-tail::after {
   background-image: none !important;
   border-color: #526B57 !important;
 }
+
+/* Reduce space below the header */
+
+#no-downloads {
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+span.banner-fix {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
