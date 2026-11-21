@@ -138,3 +138,23 @@ footer {
 .ribbon-inner h1 a:hover {
   text-decoration: none;
 }
+
+
+/* Forest & Parchment - Merlot banner overrides */
+
+header .ribbon-inner {
+  background: #263D32 !important;
+  background-image: linear-gradient(#263D32, #263D32) !important;
+}
+
+header .ribbon-outer .left-tail,
+header .ribbon-outer .right-tail {
+  background: #263D32 !important;
+  background-image: none !important;
+}
+
+header .ribbon-inner h1,
+header .ribbon-inner h2 {
+  color: #E9E1CE !important;
+}
+
