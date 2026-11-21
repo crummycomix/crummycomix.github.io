@@ -191,3 +191,27 @@ span.banner-fix {
   background: none !important;
   background-image: none !important;
 }
+
+/* Make the entire footer ribbon sage green */
+
+footer .ribbon-outer,
+footer .ribbon-inner,
+footer .left-tail,
+footer .right-tail {
+  background: #526B57 !important;
+  background-image: none !important;
+  border-color: #526B57 !important;
+}
+
+footer .ribbon-outer::before,
+footer .ribbon-outer::after,
+footer .ribbon-inner::before,
+footer .ribbon-inner::after,
+footer .left-tail::before,
+footer .left-tail::after,
+footer .right-tail::before,
+footer .right-tail::after {
+  background: #526B57 !important;
+  background-image: none !important;
+  border-color: #526B57 !important;
+}
